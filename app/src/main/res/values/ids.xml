@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="star_1" type="id"/>
+    <item name="star_2" type="id"/>
+    <item name="star_3" type="id"/>
+    <item name="star_4" type="id"/>
+    <item name="star_5" type="id"/>
+    <item name="star_6" type="id"/>
+    <item name="star_7" type="id"/>
+    <item name="star_8" type="id"/>
+    <item name="star_9" type="id"/>
+    <item name="star_10" type="id"/>
+</resources>

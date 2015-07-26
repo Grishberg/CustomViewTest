@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="starIds">
+        <item>@id/star_1</item>
+        <item>@id/star_2</item>
+        <item>@id/star_3</item>
+        <item>@id/star_4</item>
+        <item>@id/star_5</item>
+        <item>@id/star_6</item>
+        <item>@id/star_7</item>
+        <item>@id/star_8</item>
+        <item>@id/star_9</item>
+        <item>@id/star_10</item>
+    </integer-array>
+</resources>
