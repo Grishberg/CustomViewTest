@@ -1,27 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="horizontal">
 
     <LinearLayout
         android:id="@+id/llLeft"
-        android:orientation="horizontal"
-        android:layout_width="100dp"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:background="#335500"
+        android:orientation="horizontal"
         >
-        <TextView
-            android:text="left panel"
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            >
+            <!-- btn_star_big_on -->
+
+            <ImageView
+                android:id="@id/star_1"
+                android:layout_width="@dimen/rating_panel_star_size"
+                android:layout_height="@dimen/rating_panel_star_size"
+                android:layout_gravity="center"
+                android:src="@android:drawable/btn_star_big_on"
+                android:layout_marginRight="-25dp"
+                android:layout_toLeftOf="@id/star_2"
+                />
+
+            <ImageView
+                android:id="@id/star_2"
+                android:layout_width="@dimen/rating_panel_star_size"
+                android:layout_height="@dimen/rating_panel_star_size"
+                android:layout_gravity="center"
+                android:src="@android:drawable/btn_star_big_on"
+                android:layout_marginRight="-25dp"
+                android:layout_toLeftOf="@id/star_3"
+                />
+
+            <ImageView
+                android:id="@id/star_3"
+                android:layout_width="@dimen/rating_panel_star_size"
+                android:layout_height="@dimen/rating_panel_star_size"
+                android:layout_gravity="center"
+                android:src="@android:drawable/btn_star_big_on"
+                android:layout_marginRight="-25dp"
+                android:layout_toLeftOf="@id/star_4"
+                />
+
+            <ImageView
+                android:id="@id/star_4"
+                android:layout_width="@dimen/rating_panel_star_size"
+                android:layout_height="@dimen/rating_panel_star_size"
+                android:layout_gravity="center"
+                android:src="@android:drawable/btn_star_big_on"
+                android:layout_marginRight="-25dp"
+                android:layout_toLeftOf="@id/star_5"/>
+
+            <ImageView
+                android:id="@id/star_5"
+                android:layout_width="@dimen/rating_panel_star_size"
+                android:layout_height="@dimen/rating_panel_star_size"
+                android:layout_gravity="center"
+                android:src="@android:drawable/btn_star_big_on"
+                android:layout_marginRight="-25dp"
+                android:layout_toLeftOf="@id/star_6"/>
+
+            <ImageView
+                android:id="@id/star_6"
+                android:layout_width="@dimen/rating_panel_star_size"
+                android:layout_height="@dimen/rating_panel_star_size"
+                android:layout_gravity="center"
+                android:src="@android:drawable/btn_star_big_on"
+                android:layout_marginRight="-25dp"
+                android:layout_toLeftOf="@id/star_7"/>
+
+            <ImageView
+                android:id="@id/star_7"
+                android:layout_width="@dimen/rating_panel_star_size"
+                android:layout_height="@dimen/rating_panel_star_size"
+                android:layout_gravity="center"
+                android:src="@android:drawable/btn_star_big_on"
+                android:layout_marginRight="-25dp"
+                android:layout_toLeftOf="@id/star_8"
+                />
+
+            <ImageView
+                android:id="@id/star_8"
+                android:layout_width="@dimen/rating_panel_star_size"
+                android:layout_height="@dimen/rating_panel_star_size"
+                android:layout_gravity="center"
+                android:src="@android:drawable/btn_star_big_on"
+                android:layout_marginRight="-25dp"
+                android:layout_toLeftOf="@id/star_9"
+                />
+
+            <ImageView
+                android:id="@id/star_9"
+                android:layout_width="@dimen/rating_panel_star_size"
+                android:layout_height="@dimen/rating_panel_star_size"
+                android:layout_gravity="center"
+                android:layout_marginRight="-25dp"
+                android:layout_toLeftOf="@id/star_10"
+                android:src="@android:drawable/btn_star_big_on"/>
+
+            <ImageView
+                android:id="@id/star_10"
+                android:layout_width="@dimen/rating_panel_star_size"
+                android:layout_height="@dimen/rating_panel_star_size"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="center"
+                android:src="@android:drawable/btn_star_big_on"/>
+
+        </RelativeLayout>
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/llMain"
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#990000">
+        android:background="#990000"
+        android:orientation="horizontal">
 
     </LinearLayout>
 
