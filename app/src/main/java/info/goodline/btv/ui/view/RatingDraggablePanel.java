@@ -1,5 +1,7 @@
 package info.goodline.btv.ui.view;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -32,6 +34,7 @@ public class RatingDraggablePanel extends LinearLayout implements View.OnTouchLi
     private View mDraggView;
     private int mLastX;
     private float m;
+    private int mLeftMargin;
     private boolean mIsHidded;
 
     public RatingDraggablePanel(Context context) {
@@ -152,15 +155,18 @@ public class RatingDraggablePanel extends LinearLayout implements View.OnTouchLi
         Log.d(TAG, "on move x=" + x);
         int deltaX = x - mLastX;
         mLastX = x;
-        RelativeLayout.LayoutParams params =
-                (RelativeLayout.LayoutParams) getLayoutParams();
-        params.leftMargin += deltaX;
-        if (params.leftMargin > 0) {
-            params.leftMargin = 0;
-        } else if (params.leftMargin < -mLeftPanelWidth) {
-            params.leftMargin = -mLeftPanelWidth;
+        if(getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) getLayoutParams();
+            mLeftMargin = p.leftMargin + deltaX;
+            if (mLeftMargin > 0) {
+                mLeftMargin = 0;
+            } else if (mLeftMargin < -mDraggWidth) {
+                mLeftMargin = -mDraggWidth;
+            }
+            Log.d(TAG,"leftMargin = "+mLeftMargin);
+            p.setMargins(mLeftMargin, p.topMargin, p.rightMargin, p.bottomMargin);
+            requestLayout();
         }
-        setLayoutParams(params);
     }
 
     private void onActionDown(int x) {
@@ -170,5 +176,12 @@ public class RatingDraggablePanel extends LinearLayout implements View.OnTouchLi
 
     private void onActionUp(int x) {
         Log.d(TAG, "on up x=" + x);
+        // move left
+        animate().translationX(mLeftMargin).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+            }
+        }).start();
     }
 }

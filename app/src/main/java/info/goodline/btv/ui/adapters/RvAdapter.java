@@ -71,10 +71,10 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private RecyclerView.ViewHolder getSwipeHolder(ViewGroup viewGroup) {
         View infoView = mInflater.inflate(R.layout.view_info_container, null);
-        infoView.setLayoutParams(
+        /*infoView.setLayoutParams(
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT)
-        );
+        );*/
         View draggView = infoView.findViewById(R.id.llDragContainer);
         RatingDraggablePanel ratingDraggablePanel = new RatingDraggablePanel(viewGroup.getContext());
         ratingDraggablePanel.setLayoutParams(
