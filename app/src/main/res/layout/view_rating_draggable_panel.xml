@@ -6,6 +6,7 @@
 
     <LinearLayout
         android:id="@+id/llLeft"
+        android:orientation="horizontal"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:background="#335500"
@@ -17,6 +18,7 @@
     </LinearLayout>
     <LinearLayout
         android:id="@+id/llMain"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#990000">
