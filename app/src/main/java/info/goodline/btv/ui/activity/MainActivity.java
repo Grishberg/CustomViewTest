@@ -1,32 +1,49 @@
 package info.goodline.btv.ui.activity;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import info.goodline.btv.android_btvc.R;
+import info.goodline.btv.ui.adapters.ScrollerPagerAdapter;
 import info.goodline.btv.ui.adapters.TestPageAdapter;
 import info.goodline.btv.ui.view.CustomViewPager;
+import info.goodline.btv.ui.view.PagerScrollerView;
 
 public class MainActivity extends FragmentActivity {
     boolean isVisible = false;
-    String[] arr = {"test1", "test string 2", "test string 3"};
-    int index = 0;
-    CustomViewPager customViewPager;
+    Handler mHandler;
+    PagerScrollerView pager;
+    ScrollerPagerAdapter adapter;
+    int mNextItemIndex = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        LayoutInflater inflater = (LayoutInflater) getApplicationContext()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        customViewPager = (CustomViewPager) findViewById(R.id.viewpager);
-        TestPageAdapter mAdapter = new TestPageAdapter(getSupportFragmentManager());
-        customViewPager.setAdapter(mAdapter);
-        customViewPager.setCurrentItem(0);
+        pager = (PagerScrollerView)findViewById(R.id.viewpager);
+        adapter = new ScrollerPagerAdapter(getApplicationContext());
+        pager.setAdapter(adapter);
+        //start countdown timer
+        mHandler = new Handler();
+        mHandler.postDelayed(mRunnable, 1000);
+
     }
+
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            /** Do something **/
+            pager.setCurrentItemAutomatic(mNextItemIndex++);
+            if(mNextItemIndex > adapter.getCount()){
+                mNextItemIndex = 1;
+            }
+            mHandler.postDelayed(mRunnable, 1000);
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
