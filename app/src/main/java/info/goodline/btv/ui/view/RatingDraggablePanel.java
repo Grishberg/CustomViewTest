@@ -1,7 +1,5 @@
 package info.goodline.btv.ui.view;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -12,7 +10,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import info.goodline.btv.android_btvc.R;
 import info.goodline.btv.ui.ICanScrollInterface;
@@ -24,6 +21,7 @@ public class RatingDraggablePanel extends LinearLayout implements View.OnTouchLi
         ICanScrollInterface {
     private static final String TAG = SwipePanel.class.getSimpleName();
     private static final float SCROLL = 0.15f;
+    private static final int DURATION = 500;
     private int mRightPanelWidth;
     private int mLeftPanelWidth;
     private int mDraggWidth;
@@ -39,6 +37,8 @@ public class RatingDraggablePanel extends LinearLayout implements View.OnTouchLi
     private int mLeftMargin;
     private boolean mIsHidded;
     private boolean mIsMoving;
+    private IOnRateChangeListener mListener;
+    private int mRate;
 
     public RatingDraggablePanel(Context context) {
         super(context);
@@ -61,6 +61,8 @@ public class RatingDraggablePanel extends LinearLayout implements View.OnTouchLi
 
     public void init(View mainPanel, View dragContainer) {
         mMainView = mainPanel;
+        mMainView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
+                , ViewGroup.LayoutParams.MATCH_PARENT));
         mDraggView = dragContainer;
         llRightPanel.addView(mMainView);
         mDraggView.setOnTouchListener(this);
@@ -77,16 +79,22 @@ public class RatingDraggablePanel extends LinearLayout implements View.OnTouchLi
                     mDraggContainerLeftOffset = outRect.left;
                     mDraggContainerWidth = outRect.right - outRect.left;
                     mDraggWidth = mRightPanelWidth - mDraggContainerLeftOffset - mDraggContainerWidth;
-                    changeLeftPanelWidth(mDraggWidth);
+                    changeLeftPanelSize(mDraggWidth, getMeasuredHeight());
                     setMeasuredDimension(mRightPanelWidth + mDraggWidth, getMeasuredHeight());
                 }
             }
         });
     }
-
+    private void calculateStarMargin(int dragWith){
+        int starWidth = (int)getResources().getDimension(R.dimen.rating_panel_star_size);
+        int scale = (int)getResources().getDisplayMetrics().density;
+        int starWidthInPix = starWidth * scale;
+        int marg = dragWith - starWidthInPix * 10;
+        Log.d(TAG, "star margin" +marg);
+    }
     @Override
     public boolean isCanScroll(int x) {
-        int width = getWidth();
+        int width = mRightPanelWidth;
         int slideWidth = Math.round(width * SCROLL);
         if (x < slideWidth || x > width - slideWidth) {
             return false;
@@ -111,9 +119,10 @@ public class RatingDraggablePanel extends LinearLayout implements View.OnTouchLi
         mMainView.setLayoutParams(params);
     }
 
-    private void changeLeftPanelWidth(int width) {
+    private void changeLeftPanelSize(int width, int height) {
         ViewGroup.LayoutParams params = llLeftPanel.getLayoutParams();
         params.width = width;
+        params.height = height;
         llLeftPanel.setLayoutParams(params);
     }
 
@@ -136,7 +145,7 @@ public class RatingDraggablePanel extends LinearLayout implements View.OnTouchLi
         final int y = (int) event.getRawY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                onActionDown(x);
+                onActionDown(x, y);
                 return true;
             case MotionEvent.ACTION_MOVE:
                 onActionMove(x, y);
@@ -149,10 +158,11 @@ public class RatingDraggablePanel extends LinearLayout implements View.OnTouchLi
     }
 
     private void onActionMove(int x, int y) {
-        Log.d(TAG, "on move x=" + x);
         int deltaX = x - mLastX;
         int deltaY = y - mLastY;
+//        Log.d(TAG, "on move x=" + x+ " y="+y +" dx="+deltaX+" dy="+deltaY+ " isMoving="+mIsMoving);
         if (mIsMoving == false && Math.abs(deltaX) > Math.abs(deltaY)) {
+            Log.d(TAG, "on disable touch");
             mDraggView.getParent().requestDisallowInterceptTouchEvent(true);
             mIsMoving = true;
         }
@@ -165,38 +175,58 @@ public class RatingDraggablePanel extends LinearLayout implements View.OnTouchLi
             } else if (mLeftMargin < -mDraggWidth) {
                 mLeftMargin = -mDraggWidth;
             }
-            Log.d(TAG, "leftMargin = " + mLeftMargin);
             p.setMargins(mLeftMargin, p.topMargin, p.rightMargin, p.bottomMargin);
             requestLayout();
         }
+        mRate = getRating(mDraggWidth, mLeftMargin, 10);
+        Log.d(TAG, "rating = "+mRate);
+        if(mIsMoving){
+            if(mListener != null){
+                mListener.onRateChanging(mRate);
+            }
+        }
     }
 
-    private void onActionDown(int x) {
+    private void onActionDown(int x, int y) {
         Log.d(TAG, "on down x=" + x);
         mLastX = x;
+        mLastY = y;
     }
 
     private void onActionUp(int x) {
         Log.d(TAG, "on up x=" + x);
         if (mIsMoving) {
             mDraggView.getParent().requestDisallowInterceptTouchEvent(false);
+            mIsMoving = false;
+            if(mListener != null) {
+                mListener.onRateChanged(mRate);
+            }
+            Log.d(TAG, "on enable touch");
         }
+
         // move left
-        final int newLeftMargin = -mDraggWidth;
-        Animation a = new Animation() {
+        final int newLeftMargin = -mDraggWidth - mLeftMargin;
+        final int newLeftOffset = mLeftMargin;
+        Animation animation = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
-                changeLeftMargin((int) (newLeftMargin * interpolatedTime));
+                changeLeftMargin((int) (newLeftMargin * interpolatedTime) + newLeftOffset);
             }
         };
-        a.setDuration(500); // in ms
-        startAnimation(a);
-        /*
-        animate().translationX(-mDraggWidth).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-            }
-        }).start();*/
+        animation.setDuration(Math.abs(DURATION * newLeftMargin / mDraggWidth)); // in ms
+        startAnimation(animation);
+    }
+
+    private int getRating(int totalWidth, int offset, int maxRating){
+        return (int)(maxRating - Math.abs((float)maxRating * (float)offset/(float)totalWidth));
+    }
+
+    public void setOnRateChangeListener(IOnRateChangeListener listener){
+        mListener = listener;
+    }
+
+    public interface IOnRateChangeListener{
+        void onRateChanging(int rate);
+        void onRateChanged(int rate);
     }
 }
