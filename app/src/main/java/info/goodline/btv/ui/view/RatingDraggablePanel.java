@@ -1,6 +1,7 @@
 package info.goodline.btv.ui.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -9,7 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import info.goodline.btv.android_btvc.R;
 import info.goodline.btv.ui.ICanScrollInterface;
@@ -81,6 +84,7 @@ public class RatingDraggablePanel extends LinearLayout implements View.OnTouchLi
                     mDraggWidth = mRightPanelWidth - mDraggContainerLeftOffset - mDraggContainerWidth;
                     changeLeftPanelSize(mDraggWidth, getMeasuredHeight());
                     setMeasuredDimension(mRightPanelWidth + mDraggWidth, getMeasuredHeight());
+                    calculateStarMargin(mDraggWidth);
                 }
             }
         });
@@ -88,8 +92,21 @@ public class RatingDraggablePanel extends LinearLayout implements View.OnTouchLi
     private void calculateStarMargin(int dragWith){
         int starWidth = (int)getResources().getDimension(R.dimen.rating_panel_star_size);
         int scale = (int)getResources().getDisplayMetrics().density;
-        int starWidthInPix = starWidth * scale;
-        int marg = dragWith - starWidthInPix * 10;
+        int starWidthInPix = starWidth;
+        int marg = (dragWith - starWidthInPix * 10)/9;
+
+        // set click-listeners for each star
+        TypedArray ids = getResources().obtainTypedArray(R.array.starIds);
+        for (int i = 0; i < ids.length()-1; i++) {
+            int id = ids.getResourceId(i, 0);
+            ImageView ivStars = (ImageView) findViewById(ids.getResourceId(i, 0));
+            if(ivStars.getLayoutParams() instanceof RelativeLayout.LayoutParams){
+                RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) ivStars.getLayoutParams();
+                p.rightMargin = marg;
+                ivStars.setLayoutParams(p);
+            }
+        }
+        ids.recycle();
         Log.d(TAG, "star margin" +marg);
     }
     @Override
