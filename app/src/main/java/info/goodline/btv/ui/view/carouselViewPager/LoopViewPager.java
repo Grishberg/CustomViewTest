@@ -1,4 +1,4 @@
-package info.goodline.btv.ui.view;
+package info.goodline.btv.ui.view.carouselViewPager;
 
 import android.content.Context;
 import android.os.Parcelable;
@@ -14,15 +14,37 @@ import android.view.ViewGroup;
 /**
  * Created by g on 29.07.15.
  */
-public class PagerScrollerView extends ViewPager{
-    private static final String TAG = PagerScrollerView.class.getSimpleName();
+public class LoopViewPager extends ViewPager{
+    private static final String TAG = LoopViewPager.class.getSimpleName();
     private static final boolean DEFAULT_BOUNDARY_CASHING = false;
 
     OnPageChangeListener mOuterPageChangeListener;
     private LoopPagerAdapterWrapper mAdapter;
     private boolean mBoundaryCaching = DEFAULT_BOUNDARY_CASHING;
+    private IOnManualPageChangeListener mListener;
 
 
+    public LoopViewPager(Context context) {
+        super(context);
+        init();
+    }
+
+    public LoopViewPager(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    private void init() {
+        super.addOnPageChangeListener(onPageChangeListener);
+    }
+
+    public void release(){
+        super.removeOnPageChangeListener(onPageChangeListener);
+    }
+
+    public void setOnManualPageListener(IOnManualPageChangeListener listener){
+        mListener = listener;
+    }
     /**
      * helper function which may be used when implementing FragmentPagerAdapter
      *
@@ -80,7 +102,9 @@ public class PagerScrollerView extends ViewPager{
     public void setCurrentItem(int item) {
         if (getCurrentItem() != item) {
             setCurrentItem(item, true);
-            //TODO: restart timer
+            if(mListener != null){
+                mListener.onManualPageChanged();
+            }
         }
     }
 
@@ -95,19 +119,10 @@ public class PagerScrollerView extends ViewPager{
         mOuterPageChangeListener = listener;
     };
 
-    public PagerScrollerView(Context context) {
-        super(context);
-        init();
-    }
-
-    public PagerScrollerView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    private void init() {
-        super.setOnPageChangeListener(onPageChangeListener);
-    }
+    @Override
+    public void addOnPageChangeListener(OnPageChangeListener listener) {
+        mOuterPageChangeListener = listener;
+    };
 
     private OnPageChangeListener onPageChangeListener = new OnPageChangeListener() {
         private float mPreviousOffset = -1;
@@ -158,7 +173,7 @@ public class PagerScrollerView extends ViewPager{
         @Override
         public void onPageScrollStateChanged(int state) {
             if (mAdapter != null) {
-                int position = PagerScrollerView.super.getCurrentItem();
+                int position = LoopViewPager.super.getCurrentItem();
                 int realPosition = mAdapter.toRealPosition(position);
                 if (state == ViewPager.SCROLL_STATE_IDLE
                         && (position == 0 || position == mAdapter.getCount() - 1)) {
@@ -171,148 +186,7 @@ public class PagerScrollerView extends ViewPager{
         }
     };
 
-    public static class LoopPagerAdapterWrapper extends PagerAdapter {
-
-        private PagerAdapter mAdapter;
-
-        private SparseArray<ToDestroy> mToDestroy = new SparseArray<ToDestroy>();
-
-        private boolean mBoundaryCaching;
-
-        void setBoundaryCaching(boolean flag) {
-            mBoundaryCaching = flag;
-        }
-
-        LoopPagerAdapterWrapper(PagerAdapter adapter) {
-            this.mAdapter = adapter;
-        }
-
-        @Override
-        public void notifyDataSetChanged() {
-            mToDestroy = new SparseArray<ToDestroy>();
-            super.notifyDataSetChanged();
-        }
-
-        int toRealPosition(int position) {
-            int realCount = getRealCount();
-            if (realCount == 0)
-                return 0;
-            int realPosition = (position-1) % realCount;
-            if (realPosition < 0)
-                realPosition += realCount;
-
-            return realPosition;
-        }
-
-        public int toInnerPosition(int realPosition) {
-            int position = (realPosition + 1);
-            return position;
-        }
-
-        private int getRealFirstPosition() {
-            return 1;
-        }
-
-        private int getRealLastPosition() {
-            return getRealFirstPosition() + getRealCount() - 1;
-        }
-
-        @Override
-        public int getCount() {
-            return mAdapter.getCount() + 2;
-        }
-
-        public int getRealCount() {
-            return mAdapter.getCount();
-        }
-
-        public PagerAdapter getRealAdapter() {
-            return mAdapter;
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            int realPosition = (mAdapter instanceof FragmentPagerAdapter || mAdapter instanceof FragmentStatePagerAdapter)
-                    ? position
-                    : toRealPosition(position);
-
-            if (mBoundaryCaching) {
-                ToDestroy toDestroy = mToDestroy.get(position);
-                if (toDestroy != null) {
-                    mToDestroy.remove(position);
-                    return toDestroy.object;
-                }
-            }
-            return mAdapter.instantiateItem(container, realPosition);
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            int realFirst = getRealFirstPosition();
-            int realLast = getRealLastPosition();
-            int realPosition = (mAdapter instanceof FragmentPagerAdapter || mAdapter instanceof FragmentStatePagerAdapter)
-                    ? position
-                    : toRealPosition(position);
-
-            if (mBoundaryCaching && (position == realFirst || position == realLast)) {
-                mToDestroy.put(position, new ToDestroy(container, realPosition,
-                        object));
-            } else {
-                mAdapter.destroyItem(container, realPosition, object);
-            }
-        }
-
-    /*
-     * Delegate rest of methods directly to the inner adapter.
-     */
-
-        @Override
-        public void finishUpdate(ViewGroup container) {
-            mAdapter.finishUpdate(container);
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return mAdapter.isViewFromObject(view, object);
-        }
-
-        @Override
-        public void restoreState(Parcelable bundle, ClassLoader classLoader) {
-            mAdapter.restoreState(bundle, classLoader);
-        }
-
-        @Override
-        public Parcelable saveState() {
-            return mAdapter.saveState();
-        }
-
-        @Override
-        public void startUpdate(ViewGroup container) {
-            mAdapter.startUpdate(container);
-        }
-
-        @Override
-        public void setPrimaryItem(ViewGroup container, int position, Object object) {
-            mAdapter.setPrimaryItem(container, position, object);
-        }
-
-    /*
-     * End delegation
-     */
-
-    }
-    /**
-     * Container class for caching the boundary views
-     */
-    static class ToDestroy {
-        ViewGroup container;
-        int position;
-        Object object;
-
-        public ToDestroy(ViewGroup container, int position, Object object) {
-            this.container = container;
-            this.position = position;
-            this.object = object;
-        }
+    public interface IOnManualPageChangeListener{
+        void onManualPageChanged();
     }
 }

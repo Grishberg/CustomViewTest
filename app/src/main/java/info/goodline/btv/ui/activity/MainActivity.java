@@ -11,35 +11,19 @@ import info.goodline.btv.ui.view.carouselViewPager.PagerScrollerView;
 
 public class MainActivity extends FragmentActivity {
     boolean isVisible = false;
-    Handler mHandler;
     PagerScrollerView pager;
     ScrollerPagerAdapter adapter;
-    int mNextItemIndex = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        pager = (PagerScrollerView)findViewById(R.id.viewpager);
+        pager = (PagerScrollerView)findViewById(R.id.loopviewpager);
         adapter = new ScrollerPagerAdapter(getApplicationContext());
         pager.setAdapter(adapter);
-        //start countdown timer
-        mHandler = new Handler();
-        mHandler.postDelayed(mRunnable, 1000);
-
     }
 
-    private Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            /** Do something **/
-            pager.setCurrentItemAutomatic(mNextItemIndex++);
-            if(mNextItemIndex > adapter.getCount()){
-                mNextItemIndex = 1;
-            }
-            mHandler.postDelayed(mRunnable, 1000);
-        }
-    };
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -13,7 +13,7 @@
         </info.goodline.btv.ui.view.CustomViewPager>
      -->
     <info.goodline.btv.ui.view.carouselViewPager.PagerScrollerView
-        android:id="@+id/viewpager"
+        android:id="@+id/loopviewpager"
         android:layout_width="match_parent"
         android:layout_height="200dp"/>
 
