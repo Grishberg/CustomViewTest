@@ -1,17 +1,13 @@
 package info.goodline.btv.ui.activity;
 
-import android.content.Context;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import info.goodline.btv.android_btvc.R;
 import info.goodline.btv.ui.adapters.ScrollerPagerAdapter;
-import info.goodline.btv.ui.adapters.TestPageAdapter;
-import info.goodline.btv.ui.view.CustomViewPager;
-import info.goodline.btv.ui.view.PagerScrollerView;
+import info.goodline.btv.ui.view.carouselViewPager.PagerScrollerView;
 
 public class MainActivity extends FragmentActivity {
     boolean isVisible = false;
