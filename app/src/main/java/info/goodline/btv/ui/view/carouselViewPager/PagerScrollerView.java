@@ -12,17 +12,19 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+
+import info.goodline.btv.android_btvc.R;
 
 /**
  * Created by g on 29.07.15.
  */
-public class PagerScrollerView extends FrameLayout implements
+public class PagerScrollerView extends LinearLayout implements
         LoopViewPager.IOnManualPageChangeListener{
     private static final String TAG = PagerScrollerView.class.getSimpleName();
-    private static final int DURATION = 2000;
+    private static final int DURATION = 1000;
     private LoopViewPager viewPager;
     private Handler mHandler;
-    private int mNextItemIndex = 1;
     private PagerAdapter mAdapter;
 
 
@@ -32,14 +34,17 @@ public class PagerScrollerView extends FrameLayout implements
     }
 
     public PagerScrollerView(Context context, AttributeSet attrs){
-        super((context));
+        super(context,attrs);
         init();
     }
 
     private void init(){
+        setBackgroundColor(0xFFAA00);
         viewPager = new LoopViewPager(getContext());
+        viewPager.setOnManualPageListener(this);
         viewPager.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
+        addView(viewPager);
 
     }
 
@@ -63,11 +68,13 @@ public class PagerScrollerView extends FrameLayout implements
         @Override
         public void run() {
             /** Do something **/
-            viewPager.setCurrentItemAutomatic(mNextItemIndex++);
-            if(mNextItemIndex > mAdapter.getCount()){
-                mNextItemIndex = 1;
-            }
+            viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
             mHandler.postDelayed(mRunnable, DURATION);
         }
     };
+
+    public void release(){
+        mHandler.removeCallbacks(mRunnable);
+        viewPager.release();
+    }
 }

@@ -5,7 +5,7 @@
               android:background="#99FF99"
               android:orientation="vertical">
 
-    <info.goodline.btv.ui.view.carouselViewPager.PagerScrollerView
+    <info.goodline.btv.ui.view.carouselViewPager.LoopViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

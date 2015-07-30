@@ -64,11 +64,10 @@ public class SwipePanel extends LinearLayout implements View.OnTouchListener
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        if(mRightPanelWidth == 0) {
+        if (mRightPanelWidth == 0) {
             mRightPanelWidth = getMeasuredWidth();
-
         }
-        if(mLeftPanelWidth == 0) {
+        if (mLeftPanelWidth == 0) {
             mLeftView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
             mLeftPanelWidth = mLeftView.getMeasuredWidth();
         }
@@ -121,7 +120,7 @@ public class SwipePanel extends LinearLayout implements View.OnTouchListener
                     mIsExpanded = true;
                 }
             }).start();
-        } else if(mIsExpanded){
+        } else if (mIsExpanded) {
             // move left
             animate().translationX(0).setListener(new AnimatorListenerAdapter() {
                 @Override

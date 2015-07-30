@@ -7,22 +7,22 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseArray;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 /**
  * Created by g on 29.07.15.
  */
-public class LoopViewPager extends ViewPager{
+public class LoopViewPager extends ViewPager {
     private static final String TAG = LoopViewPager.class.getSimpleName();
     private static final boolean DEFAULT_BOUNDARY_CASHING = false;
-
     OnPageChangeListener mOuterPageChangeListener;
     private LoopPagerAdapterWrapper mAdapter;
     private boolean mBoundaryCaching = DEFAULT_BOUNDARY_CASHING;
     private IOnManualPageChangeListener mListener;
-
 
     public LoopViewPager(Context context) {
         super(context);
@@ -38,13 +38,14 @@ public class LoopViewPager extends ViewPager{
         super.addOnPageChangeListener(onPageChangeListener);
     }
 
-    public void release(){
+    public void release() {
         super.removeOnPageChangeListener(onPageChangeListener);
     }
 
-    public void setOnManualPageListener(IOnManualPageChangeListener listener){
+    public void setOnManualPageListener(IOnManualPageChangeListener listener) {
         mListener = listener;
     }
+
     /**
      * helper function which may be used when implementing FragmentPagerAdapter
      *
@@ -52,12 +53,12 @@ public class LoopViewPager extends ViewPager{
      * @param count
      * @return (position-1)%count
      */
-    public static int toRealPosition( int position, int count ){
-        position = position-1;
-        if( position < 0 ){
+    public static int toRealPosition(int position, int count) {
+        position = position - 1;
+        if (position < 0) {
             position += count;
-        }else{
-            position = position%count;
+        } else {
+            position = position % count;
         }
         return position;
     }
@@ -94,6 +95,7 @@ public class LoopViewPager extends ViewPager{
     }
 
     public void setCurrentItem(int item, boolean smoothScroll) {
+        Log.d(TAG, "setCurrentItem item="+item+" smooth="+smoothScroll);
         int realItem = mAdapter.toInnerPosition(item);
         super.setCurrentItem(realItem, smoothScroll);
     }
@@ -102,27 +104,28 @@ public class LoopViewPager extends ViewPager{
     public void setCurrentItem(int item) {
         if (getCurrentItem() != item) {
             setCurrentItem(item, true);
-            if(mListener != null){
-                mListener.onManualPageChanged();
-            }
-        }
-    }
-
-    public void setCurrentItemAutomatic(int item) {
-        if (getCurrentItem() != item) {
-            setCurrentItem(item, true);
         }
     }
 
     @Override
     public void setOnPageChangeListener(OnPageChangeListener listener) {
         mOuterPageChangeListener = listener;
-    };
+    }
 
     @Override
     public void addOnPageChangeListener(OnPageChangeListener listener) {
         mOuterPageChangeListener = listener;
-    };
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        if(ev.getAction() == MotionEvent.ACTION_DOWN) {
+            if (mListener != null) {
+                mListener.onManualPageChanged();
+            }
+        }
+        return super.onTouchEvent(ev);
+    }
 
     private OnPageChangeListener onPageChangeListener = new OnPageChangeListener() {
         private float mPreviousOffset = -1;
@@ -130,7 +133,6 @@ public class LoopViewPager extends ViewPager{
 
         @Override
         public void onPageSelected(int position) {
-
             int realPosition = mAdapter.toRealPosition(position);
             if (mPreviousPosition != realPosition) {
                 mPreviousPosition = realPosition;
@@ -172,6 +174,7 @@ public class LoopViewPager extends ViewPager{
 
         @Override
         public void onPageScrollStateChanged(int state) {
+
             if (mAdapter != null) {
                 int position = LoopViewPager.super.getCurrentItem();
                 int realPosition = mAdapter.toRealPosition(position);
@@ -186,7 +189,7 @@ public class LoopViewPager extends ViewPager{
         }
     };
 
-    public interface IOnManualPageChangeListener{
+    public interface IOnManualPageChangeListener {
         void onManualPageChanged();
     }
 }
