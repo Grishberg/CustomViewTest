@@ -7,8 +7,14 @@ import retrofit.RestAdapter;
  */
 public abstract class RestRequest<T> {
     private static int id;
+    private String mTag;
 
     public RestRequest() {
+        this("");
+    }
+
+    public RestRequest(String tag) {
+        mTag = tag;
         id++;
         if(id > 0xFFFF){
             id = 0;
@@ -45,7 +51,11 @@ public abstract class RestRequest<T> {
 
     }
 
-    public int getId() {
+    public String getTag() {
+        return mTag;
+    }
+
+    public int getId(){
         return id;
     }
 }

@@ -26,6 +26,11 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+        <service
+            android:name="info.goodline.btv.data.service.BackgroundWorkerService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>
