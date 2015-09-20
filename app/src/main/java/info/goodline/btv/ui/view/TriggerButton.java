@@ -1,9 +1,9 @@
 package info.goodline.btv.ui.view;
 
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
@@ -12,17 +12,10 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-//import butterknife.Bind;
-//import butterknife.ButterKnife;
-//import info.goodline.btv.R;
-
-
-import android.widget.FrameLayout;
-
 import info.goodline.btv.android_btvc.R;
 
 /**
- * Created by g on 17.07.15.
+ * Created by g on 15.07.15.
  */
 public class TriggerButton extends FrameLayout implements View.OnClickListener {
 
@@ -30,6 +23,8 @@ public class TriggerButton extends FrameLayout implements View.OnClickListener {
     private TransitionDrawable mTransition;
     private OnClickListener mClickListener;
     private boolean mIsPressed;
+    private Drawable mDrawable1;
+    private Drawable mDrawable2;
     private int mShortAnimationDuration = 500;
     private Drawable[] mDrawables;
 
@@ -43,31 +38,34 @@ public class TriggerButton extends FrameLayout implements View.OnClickListener {
                 attrs,
                 R.styleable.TriggerButton,
                 0, 0);
-        int transitionRes = 0;
         try {
-            transitionRes = a.getResourceId(R.styleable.TriggerButton_transitionRes
-                    , R.drawable.abc_list_focused_holo);
+            mDrawable1 = a.getDrawable(R.styleable.TriggerButton_imageRes1);
+            mDrawable2 = a.getDrawable(R.styleable.TriggerButton_imageRes2);
         } finally {
             a.recycle();
         }
 
-        mTransition = (TransitionDrawable)getResources().getDrawable(transitionRes);
-
         inflate(context, R.layout.view_trigger_button, this);
         ivContainer = (ImageView) findViewById(R.id.ivTriggerButtonContainer);
 
-        ivContainer.setImageDrawable(mTransition);
         ivContainer.setOnClickListener(this);
     }
 
-    public void init(boolean isPressed) {
-        mIsPressed = isPressed;
-
-        if (isPressed) {
-            mTransition.startTransition(0);
+    private void initTransition(boolean mIsPressed) {
+        if (mIsPressed) {
+            mDrawables = new Drawable[]{mDrawable2, mDrawable1};
         } else {
-            //mTransition.resetTransition();
+            mDrawables = new Drawable[]{mDrawable1, mDrawable2};
         }
+        mTransition = new TransitionDrawable(mDrawables);
+        mTransition.setCrossFadeEnabled(true);
+        ivContainer.setImageDrawable(mTransition);
+    }
+
+    public void init(boolean isPressed) {
+        if (mIsPressed == isPressed && mTransition != null) return;
+        mIsPressed = isPressed;
+        initTransition(isPressed);
     }
 
     @Override
@@ -80,16 +78,16 @@ public class TriggerButton extends FrameLayout implements View.OnClickListener {
 
     private void changeState() {
         mIsPressed = !mIsPressed;
-        if (mIsPressed) {
-            mTransition.startTransition(mShortAnimationDuration);
-        } else {
-            mTransition.reverseTransition(mShortAnimationDuration);
-        }
+        mTransition.reverseTransition(mShortAnimationDuration);
     }
 
     @Override
     public void setOnClickListener(OnClickListener l) {
         super.setOnClickListener(l);
         mClickListener = l;
+    }
+
+    public boolean isPressed() {
+        return mIsPressed;
     }
 }

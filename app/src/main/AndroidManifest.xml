@@ -16,6 +16,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="info.goodline.btv.ui.activity.SecondActivity"
+            android:label="@string/title_activity_second" >
+        </activity>
+
+        <service
+            android:name="info.goodline.btv.data.service.ApiService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

@@ -1,8 +1,9 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+              android:orientation="vertical"
                 tools:context=".MainActivity">
 
     <!--
@@ -12,9 +13,20 @@
             android:layout_height="match_parent">
         </info.goodline.btv.ui.view.CustomViewPager>
      -->
-    <info.goodline.btv.ui.view.carouselViewPager.PagerScrollerView
-        android:id="@+id/loopviewpager"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"/>
 
-</RelativeLayout>
+    <Button
+        android:id="@+id/btnNextScreen"
+        android:text="next screen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <info.goodline.btv.ui.view.SwipePanel
+        android:id="@+id/swipe1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></info.goodline.btv.ui.view.SwipePanel>
+
+    <info.goodline.btv.ui.view.SwipePanel
+        android:id="@+id/swipe2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></info.goodline.btv.ui.view.SwipePanel>
+
+</LinearLayout>
