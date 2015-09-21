@@ -77,8 +77,7 @@ public abstract class BaseBinderService extends Service {
      * send message to activities
      */
     protected void sendMessage(String action, int code, int id) {
-        Intent intent = new Intent(Const.REST_SERVICE_INTENT_FILTER);
-        intent.setAction(action);
+        Intent intent = new Intent(action);
         intent.putExtra(Const.REST_SERVICE_RESPONSE_CODE_EXTRA, code);
         intent.putExtra(Const.REST_SERVICE_RESPONSE_ID_EXTRA, id);
         LocalBroadcastManager.getInstance(this).

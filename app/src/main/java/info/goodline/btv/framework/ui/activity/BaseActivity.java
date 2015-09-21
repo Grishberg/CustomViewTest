@@ -120,14 +120,19 @@ public class BaseActivity extends Activity {
             Log.d(TAG, "onServiceDisconnected Worker");
         }
     };
-
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
 
         public void onReceive(Context context, Intent intent) {
-            int responseCode = intent.getIntExtra(Const.REST_SERVICE_RESPONSE_CODE_EXTRA, 0);
-            int responseId = intent.getIntExtra(Const.REST_SERVICE_RESPONSE_ID_EXTRA, 0);
-            onResponse(responseCode, responseId);
+            switch (intent.getAction()) {
+                case Const.REST_SERVICE_ACTION:
+                    int responseCode = intent.getIntExtra(Const.REST_SERVICE_RESPONSE_CODE_EXTRA, 0);
+                    int responseId = intent.getIntExtra(Const.REST_SERVICE_RESPONSE_ID_EXTRA, 0);
+                    onResponse(responseCode, responseId);
+                    break;
+                case Const.WORKER_SERVICE_ACTION:
+                    break;
+            }
         }
     };
 
