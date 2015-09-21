@@ -12,20 +12,28 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import info.goodline.btv.data.service.ApiService;
+import info.goodline.btv.data.service.BackgroundWorkerService;
+import info.goodline.btv.framework.Const;
+
 /**
  * Created by g on 20.09.15.
  */
 public class BaseActivity extends Activity {
     private static final String TAG = BaseActivity.class.getSimpleName();
-    private static final String LOCAL_INTENT_FILTER = "localIntentFilter";
-    private boolean mIsBound;
+    private boolean mIsBoundApiService;
+    private boolean mIsBoundWorkerService;
+    private Intent mApiServiceIntent;
+    private Intent mWorkerServiceIntent;
     private boolean mIsBroadcasRegistered;
     private IntentFilter mLocalBroadcast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLocalBroadcast = new IntentFilter(LOCAL_INTENT_FILTER);
+        mLocalBroadcast = new IntentFilter(Const.REST_SERVICE_INTENT_FILTER);
+        mApiServiceIntent = new Intent(this, ApiService.class);
+        mWorkerServiceIntent = new Intent(this, BackgroundWorkerService.class);
         registerBroadcast();
     }
 
@@ -49,6 +57,7 @@ public class BaseActivity extends Activity {
         unregisterBroadcast();
     }
 
+    //------------ helper ----------------------------
     private void registerBroadcast() {
         if (!mIsBroadcasRegistered) {
             LocalBroadcastManager.getInstance(this).registerReceiver(
@@ -66,46 +75,68 @@ public class BaseActivity extends Activity {
     }
 
     private void bindToService() {
-        if (!mIsBound) {
-
+        if (!mIsBoundApiService) {
+            bindService(mApiServiceIntent, mApiServiceConnection, Context.BIND_AUTO_CREATE);
+        }
+        if (!mIsBoundWorkerService) {
+            bindService(mWorkerServiceIntent, mWorkerServiceConnection, Context.BIND_AUTO_CREATE);
         }
     }
 
     private void unbindFromService() {
-        if (mIsBound) {
+        if (mIsBoundApiService) {
+            unbindService(mApiServiceConnection);
+        }
 
+        if (mIsBoundWorkerService) {
+            unbindService(mApiServiceConnection);
         }
     }
 
     // connecting to Services
-    private ServiceConnection mRestServiceConnection = new ServiceConnection() {
+    private ServiceConnection mApiServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(TAG, "onServiceConnected");
-            mIsBound = true;
+            Log.d(TAG, "onServiceConnected ApiService");
+            mIsBoundApiService = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mIsBound = false;
-            Log.d(TAG, "onServiceDisconnected");
+            mIsBoundApiService = false;
+            Log.d(TAG, "onServiceDisconnected ApiService");
         }
     };
+    private ServiceConnection mWorkerServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "onServiceConnected Worker");
+            mIsBoundWorkerService = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mIsBoundWorkerService = false;
+            Log.d(TAG, "onServiceDisconnected Worker");
+        }
+    };
+
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
 
         public void onReceive(Context context, Intent intent) {
-
-            String action = intent.getAction();
-
-            Double currentSpeed = intent.getDoubleExtra("currentSpeed", 20);
-
-            Double currentLatitude = intent.getDoubleExtra("latitude", 0);
-
-            Double currentLongitude = intent.getDoubleExtra("longitude", 0);
-
-            //  ... react to local broadcast message
-
+            int responseCode = intent.getIntExtra(Const.REST_SERVICE_RESPONSE_CODE_EXTRA, 0);
+            int responseId = intent.getIntExtra(Const.REST_SERVICE_RESPONSE_ID_EXTRA, 0);
+            onResponse(responseCode, responseId);
         }
     };
+
+    /**
+     * receive response from service
+     *
+     * @param responseCode
+     * @param requestId
+     */
+    protected void onResponse(int responseCode, int requestId) {
+    }
 }

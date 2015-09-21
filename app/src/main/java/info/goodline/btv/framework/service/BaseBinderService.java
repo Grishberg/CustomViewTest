@@ -7,6 +7,8 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
+import info.goodline.btv.framework.Const;
+
 /**
  * Created by g on 19.09.15.
  */
@@ -26,7 +28,6 @@ public abstract class BaseBinderService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
     }
 
     @Override
@@ -73,17 +74,14 @@ public abstract class BaseBinderService extends Service {
     };
 
     /**
-     * send messsage to activities
-     *
-     * @param action
-     * @param message
+     * send message to activities
      */
-    protected void sendMessage(String action, int message) {
-        Intent sendableIntent = new Intent(getClass().getName());
-        sendableIntent.setAction(action);
+    protected void sendMessage(String action, int code, int id) {
+        Intent intent = new Intent(Const.REST_SERVICE_INTENT_FILTER);
+        intent.setAction(action);
+        intent.putExtra(Const.REST_SERVICE_RESPONSE_CODE_EXTRA, code);
+        intent.putExtra(Const.REST_SERVICE_RESPONSE_ID_EXTRA, id);
         LocalBroadcastManager.getInstance(this).
-                sendBroadcast(sendableIntent);
+                sendBroadcast(intent);
     }
-
-
 }
