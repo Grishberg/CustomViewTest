@@ -1,24 +1,18 @@
 package info.goodline.btv.data.service;
 
+import android.os.Binder;
+import android.os.IBinder;
 import android.util.SparseArray;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import info.goodline.btv.framework.RestRequest;
+import info.goodline.btv.framework.service.BaseThreadPoolService;
 
-public class ApiService extends BaseBinderService implements IApiService, IRunObserver {
-    protected volatile Map<String, SparseArray<Future>> mTaskQueue;
-    private static final int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
-    protected static final int CORE_POOL_SIZE = NUMBER_OF_CORES * 2;
-    protected ExecutorService mExecutor;
+public class ApiService extends BaseThreadPoolService implements IApiService {
+    private ApiBinder mBinder = new ApiBinder();
 
     public ApiService() {
-        mTaskQueue = new HashMap<>(CORE_POOL_SIZE);
-        mExecutor = Executors.newFixedThreadPool(CORE_POOL_SIZE);
 
     }
 
@@ -51,19 +45,22 @@ public class ApiService extends BaseBinderService implements IApiService, IRunOb
         }
     }
 
-    /**
-     * removes task from queue when it's done
-     *
-     * @param id
-     */
-    @Override
-    public void onTaskDone(String tag, int id) {
-        mTaskQueue.remove(id);
-    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mExecutor.shutdown();
+    }
+
+    @Override
+    protected IBinder getBinder() {
+        return mBinder;
+    }
+
+    // service container for Activity
+    public class ApiBinder extends Binder {
+        public IApiService getService() {
+            return ApiService.this;
+        }
     }
 }

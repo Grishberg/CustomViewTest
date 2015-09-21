@@ -1,9 +1,9 @@
 package info.goodline.btv.data.service;
 
-import android.app.Service;
-import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+
+import info.goodline.btv.framework.service.BaseBinderService;
 
 public class BackgroundWorkerService extends BaseBinderService
         implements IBackgroundWorkerService {
